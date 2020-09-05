@@ -1,0 +1,114 @@
+	
+	**gulp是前端开发过程中对代码进行构建的工具，是自动化项目的构建利器；她不仅能对网站资源进行优化，而且在开发过程中很多重复的任务能够	使用正确的工具自动完成；使用她，我们不仅可以很愉快的编写代码，而且大大提高我们的工作效率。
+	
+	下面我来总结一下gulp再工作中使用较为频繁的语法：
+
+	.1 复制 gulp/css 至 dist/css
+	（1.拿到css文件夹下所有文件
+	语法：gulp.src('./css/**/*')
+	（2.拷贝css文件夹下的所有文件以及文件夹内的文件
+	语法：gulp.task('copy-css', function () {
+    			gulp.src('./css/**/*')
+       			 .pipe(gulp.dest('dist/css'))  //所有文件拷贝到dist文件加内
+			})
+	指令:gulp copy-css
+
+	.2 合并css文件
+	安装合并模块
+	指令:cnpm i gulp-concat -S
+	合并代码如下:
+	const concat = require('gulp-concat');  //引入合并模块
+	gulp.task('copy-css', function () {
+   		 gulp.src('./css/**/*') // 拿到所有的css
+        		.pipe(concat('main.css')) // 合并
+        		.pipe(gulp.dest('dist/css'))
+		})
+	.3 压缩css
+	安装压缩模块
+	指令:cnpm i gulp-minify-css -S
+	const minifyCss = require('gulp-minify-css');  //引入压缩模块
+	gulp.task('copy-css', function () {
+    		gulp.src('./css/**/*') // 拿到所有的css
+       		.pipe(concat('main.css')) // 合并
+        		.pipe(minifyCss()) // 压缩
+        		.pipe(gulp.dest('dist/css'))
+		})
+	.4 既要 未压缩的也要有压缩的
+	安装重命名模块
+	cnpm i gulp-rename -S
+	重命名
+	合并代码放到dist/css
+	压缩css 重命名 再放到dist/css
+	const rename = require('gulp-rename');  //引入重命名模块
+	gulp.task('copy-css', function () {
+    		gulp.src('./css/**/*') // 拿到所有的css
+        		.pipe(concat('main.css')) // 合并
+        		.pipe(gulp.dest('dist/css'))
+        		.pipe(minifyCss()) // 压缩
+        		.pipe(rename('main.min.css'))  //重命名为main.min.css
+        		.pipe(gulp.dest('dist/css'))
+		})
+	2.1 复制gulp/js 至 dist/js
+	本质也是文件的合并,操作方法一致
+	gulp.task('copy-js', () => {
+    		gulp.src('./js/**/*')
+        		.pipe(gulp.dest('dist/js'))
+		})
+	2.2 合并js代码至 dist/js
+	gulp.task('copy-js', () => {
+    		gulp.src('./js/**/*')
+        		.pipe(concat('main.js'))
+       	 	.pipe(gulp.dest('dist/js'))
+		})
+	2.3 压缩js
+	需要下载压缩js模块
+	指令: cnpm i gulp-uglify -S
+	//引用压缩js模块
+	const uglify = require('gulp-uglify');
+	gulp.task('copy-js', () => {
+    		gulp.src('./js/**/*')
+        		.pipe(concat('main.js')) // 合并js
+        		.pipe(uglify()) // 压缩js
+        		.pipe(gulp.dest('dist/js'))
+		})
+	2.4 合并压缩重命名
+	gulp.task('copy-js', () => {
+    		gulp.src('./js/**/*')
+        		.pipe(concat('main.js')) // 合并js
+        		.pipe(gulp.dest('dist/js'))
+        		.pipe(uglify()) // 压缩js
+        		.pipe(rename('main.min.js'))
+        		.pipe(gulp.dest('dist/js'))
+		})
+	3.1 复制图片至 dist/assets
+	gulp.task('copy-images', () => {
+    		gulp.src('./assets/**/*')
+        		.pipe(gulp.dest('dist/assets'))
+		})
+	3.2 压缩图片
+	需要下载压缩图片模块
+	指令:cnpm i gulp-imagemin -S
+	//引入压缩图片模块
+	const imagemin = require('gulp-imagemin');
+	gulp.task('copy-images', () => {
+    		gulp.src('./assets/**/*')
+        		.pipe(imagemin()) // 压缩图片
+        		.pipe(gulp.dest('dist/assets'))
+		})
+	**一次性执行多个任务
+	gulp.task('build', ['copy-index', 'copy-css', 'copy-js', 'copy-images', 'copy-data'], () => {
+    	console.log('success')
+	})
+	**检测html文件、css文件、js文件、图片、数据的改变，执行不同的任务
+	gulp.task('watch', () => {
+    		gulp.watch('index.html', ['copy-index'])
+    		gulp.watch('css/**/*', ['copy-css'])
+    		gulp.watch('js/**/*', ['copy-js'])
+    		gulp.watch('assets/**/*', ['copy-images'])
+    		gulp.watch('data/**/*', ['copy-data'])
+		})
+	**同时默认执行 server 任务 和 watch 任务
+	gulp.task('default', ['server', 'watch'])
+	
+	注：以上是个人总结基础语法，欢迎与我一起讨论。
+                             文章不对的地方，还请读者费心指出
